@@ -47,7 +47,7 @@ To run this project locally, follow these steps:
 ### Prerequisites
 - **Web Browser**: Any modern browser (Chrome, Firefox, Edge, Safari) is required.
 - **Code Editor**: Recommended editors include VS Code, Sublime Text, or JetBrains WebStorm.
-- **Node.js & npm**: Ensure Node.js is installed to manage dependencies.
+- **Node.js & npm**: Ensure Node.js is installed to manage dependencies. **Required Node.js Version: v22.13.1**
 - **Package Manager**: Use `npm` (included with Node.js) or `yarn` to install dependencies.
 
 ### Installation
@@ -92,5 +92,3 @@ You can add more test cases to improve project coverage.
 - **Malak Damlakhi** - Development & Project Implementation
   
 Feel free to contribute by submitting pull requests or reporting issues!
-
-
