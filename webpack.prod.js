@@ -1,9 +1,10 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin"),
     TerserPlugin = require("terser-webpack-plugin"),
     path = require("path"),
-    common = require("./webpack.common.js");
-    const { merge } = require("webpack-merge"),
-    CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+    common = require("./webpack.common.js"),
+    { merge } = require("webpack-merge"),
+    CssMinimizerPlugin = require("css-minimizer-webpack-plugin"),
+    WorkboxPlugin = require("workbox-webpack-plugin");
 
 module.exports = merge(common, {
     mode: "production",
@@ -26,8 +27,6 @@ module.exports = merge(common, {
     optimization: {
         minimize: true,
         minimizer: [
-            // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
-            // `...`,
             new CssMinimizerPlugin(),
             new TerserPlugin()
         ],
@@ -35,6 +34,10 @@ module.exports = merge(common, {
     plugins: [
         new MiniCssExtractPlugin({
             filename: 'style.[contenthash].css'
-        })
+        }),
+        new WorkboxPlugin.GenerateSW({
+            clientsClaim: true,
+            skipWaiting: true,
+        }),
     ]
-})
+});

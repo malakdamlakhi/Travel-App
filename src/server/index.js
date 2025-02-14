@@ -16,7 +16,7 @@ const { weatherTemp } = require("./weatherTemp");
 const { getCityPic } = require("./getCityPic");
 
 // تحميل مفاتيح API من .env أو تعيين قيم افتراضية
-const GEO_USERNAME =  "MalakDamlakhi";
+const GEO_USERNAME = "MalakDamlakhi";
 const WEATHER_API_KEY = process.env.WEATHER_KEY || "fda4314c2e6f47e698dd4f32bf41f7a8";
 const PIXABAY_API_KEY = process.env.PIXABAY_KEY || "48705890-256175c2d30e01e89e3bfc758";
 
@@ -25,18 +25,37 @@ console.log("✅ GeoNames Username:", GEO_USERNAME);
 console.log("✅ Weather API Key:", WEATHER_API_KEY);
 console.log("✅ Pixabay API Key:", PIXABAY_API_KEY);
 
+// تسجيل جميع الطلبات الواردة
+app.use((req, res, next) => {
+    console.log(`📩 Request: ${req.method} ${req.url}`);
+    console.log("📋 Request Body:", req.body);
+    next();
+});
+
 // المسار الرئيسي
 app.get("/", (req, res) => {
-    res.sendFile("index.html", { root: "dist" });
+    console.log("🏠 Serving index.html from dist/");
+    res.sendFile("index.html", { root: "dist" }, (err) => {
+        if (err) {
+            console.error("❌ Error serving index.html:", err);
+            res.status(500).send("Error loading the page.");
+        }
+    });
 });
 
 // مسار لجلب معلومات المدينة
 app.post("/getCity", async (req, res) => {
     const { city } = req.body;
-    if (!city) return res.status(400).json({ error: "City name is required." });
+    console.log(`🏙️ Requested City: ${city}`);
+
+    if (!city) {
+        console.warn("⚠️ City name is missing!");
+        return res.status(400).json({ error: "City name is required." });
+    }
 
     try {
         const location = await getCityLoc(city, GEO_USERNAME);
+        console.log("✅ City Location Data:", location);
         res.json(location);
     } catch (error) {
         console.error("❌ Error fetching city location:", error);
@@ -47,10 +66,16 @@ app.post("/getCity", async (req, res) => {
 // مسار لجلب الطقس
 app.post("/getWeather", async (req, res) => {
     const { lng, lat, remainingDays } = req.body;
-    if (!lng || !lat) return res.status(400).json({ error: "Coordinates are required." });
+    console.log(`🌦️ Weather Request: lng=${lng}, lat=${lat}, days=${remainingDays}`);
+
+    if (!lng || !lat) {
+        console.warn("⚠️ Missing coordinates!");
+        return res.status(400).json({ error: "Coordinates are required." });
+    }
 
     try {
         const weather = await weatherTemp(lng, lat, remainingDays, WEATHER_API_KEY);
+        console.log("✅ Weather Data:", weather);
         res.json(weather);
     } catch (error) {
         console.error("❌ Error fetching weather data:", error);
@@ -61,21 +86,40 @@ app.post("/getWeather", async (req, res) => {
 // مسار لجلب صورة المدينة
 app.post("/getCityPic", async (req, res) => {
     const { city_name } = req.body;
-    if (!city_name) return res.status(400).json({ error: "City name is required." });
+    console.log(`🖼️ Requested City Picture: ${city_name}`);
+
+    if (!city_name) {
+        console.warn("⚠️ City name is missing for picture request!");
+        return res.status(400).json({ error: "City name is required." });
+    }
 
     try {
         const picture = await getCityPic(city_name, PIXABAY_API_KEY);
+        console.log("✅ City Picture Data:", picture);
         res.json(picture);
     } catch (error) {
         console.error("❌ Error fetching city picture:", error);
         res.status(500).json({ error: "Failed to retrieve city picture." });
     }
 });
+app.get("/service-worker.js", (req, res) => {
+    res.sendFile("service-worker.js", { root: "dist" });
+});
+app.get("/service-worker.js", (req, res) => {
+    res.sendFile("service-worker.js", { root: "dist" });
+});
 
-// معالج الأخطاء العامة
+
+// معالج الخطأ العام
 app.use((err, req, res, next) => {
     console.error("🔥 Unexpected error:", err);
     res.status(500).json({ error: "Internal server error." });
+});
+
+// مسار للطلبات غير الموجودة (404)
+app.use((req, res) => {
+    console.warn(`🚨 404 Not Found: ${req.method} ${req.url}`);
+    res.status(404).json({ error: "Not Found" });
 });
 
 // تشغيل السيرفر
