@@ -1,0 +1,28 @@
+$breakpoints: (
+  "sm": 576px,
+  "md": 768px,
+  "lg": 992px,
+  "xl": 1200px
+);
+
+@function get-breakpoint($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @return map-get($breakpoints, $breakpoint);
+  } @else {
+    @error "Invalid breakpoint name: #{$breakpoint}. Available breakpoints: #{map-keys($breakpoints)}.";
+  }
+}
+
+@mixin respond-to($breakpoint) {
+  @media (min-width: get-breakpoint($breakpoint)) {
+    @content;
+  }
+}
+
+@each $name, $size in $breakpoints {
+  @media (min-width: $size) {
+    .responsive-#{$name} {
+      font-size: $size / 50;
+    }
+  }
+}
