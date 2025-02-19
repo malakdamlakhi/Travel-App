@@ -18,8 +18,7 @@ const webpack = require("webpack"),
     
         optimization: {
             minimizer: [
-                // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
-                // `...`,
+             
                 new CssMinimizerPlugin(),
             ],
             minimize: true,
@@ -30,11 +29,11 @@ const webpack = require("webpack"),
                 filename: "./index.html"
             }),
             new CleanWebpackPlugin({
-                // Simulate the removal of files
+             
                 dry: true,
-                // Write Logs to Console
+         
                 verbose: false,
-                // Automatically remove all unused webpack assets on rebuild
+            
                 cleanStaleWebpackAssets: true,
                 protectWebpackAssets: false,
                
